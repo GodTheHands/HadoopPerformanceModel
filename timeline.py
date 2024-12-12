@@ -17,12 +17,14 @@ class MapTask(Task):
         super().__init__(task_id, duration, shuffle_duration)
         self.task_type = 'Map'
         self.job_id = job_id
+        self.task_type = 0
 
 class ReduceTask(Task):
     def __init__(self, job_id, task_id, duration, shuffle_duration=0):
         super().__init__(task_id, duration, shuffle_duration)
         self.task_type = 'Reduce'
         self.job_id = job_id
+        self.task_type = 1
 
 def initialize_TL(K):
     TL = {i: [] for i in range(K)}  # 初始化 K 条时间线
