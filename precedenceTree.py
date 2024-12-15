@@ -1,3 +1,5 @@
+from collections import deque
+
 class TreeNode:
     def __init__(self, node_type, children=None, task=None):
         self.node_type = node_type
@@ -35,7 +37,7 @@ def build_priority_tree(map_TL, reduce_TL):
     # 根节点声明
     root = TreeNode('S', children=[
         LChild, RChild
-    ])
+    ])#最后将两棵树合一起
 
     root.left = LChild
     root.right = RChild
@@ -148,3 +150,57 @@ def build_binary_subtree(s_nodes):
     root.right = right_root
 
     return root
+
+#Modified
+#自顶向下，采用dfs计算
+def calculate_time_top_down(node):
+    if node is None:
+        return 0
+
+    #如果为任务节点，直接返回任务时间
+    if node.node_type == 'Task':
+        return node.task.et-node.task.st
+
+    #如果是串行节点
+    if node.node_type == 'S':
+        #累加子节点的时间
+        total_time = 0
+        for child in node.children:
+            total_time += calculate_time_top_down(child)
+        return total_time
+#    如果是并行节点 (P)
+    if node.node_type == 'P':
+        # 计算所有子节点时间的最大值，并乘以权重
+        max_time = 0
+        for child in node.children:
+            max_time = max(max_time, calculate_time_top_down(child))
+        return max_time * 1.5
+
+    # 默认返回 0
+    return 0
+
+
+#层次序遍历
+def level_order_traversal_with_levels(root):
+    if root is None:
+        return
+
+    queue = deque([(root, 0)])  # (节点, 层级)
+    current_level = 0
+
+    while queue:
+        node, level = queue.popleft()
+
+        # 如果进入新层级，打印分隔符
+        if level != current_level:
+            current_level = level
+            print(f"\nLevel {level}:")  # 输出当前层级标记
+
+        # 打印节点信息
+        print(f"  Node Type: {node.node_type}, Task: {getattr(node.task, 'task_id', None)}")
+
+        # 将子节点加入队列
+        if node.left:
+            queue.append((node.left, level + 1))
+        if node.right:
+            queue.append((node.right, level + 1))
